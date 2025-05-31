@@ -9,22 +9,21 @@ local _Mf_=function()return math.random(1,100)end local _Nf_=type(function()end)
 -- CLEAN PUBLIC API WRAPPER (users can call these)
 -- This wrapper makes the obfuscated core work with existing code
 
--- The obfuscated library is stored in _a_ 
-local NobUI = _a_  -- Direct reference to obfuscated core
+-- The obfuscated library is stored in _a_ - this is the actual working library
+-- We need to return _a_ directly so users can call _a_:Init(), _a_:CreateWindow(), etc.
 
--- Ensure CloudConfig exists on the main object
-if not NobUI.CloudConfig then
-    NobUI.CloudConfig = {}
+-- Add CloudConfig if missing
+if not _a_.CloudConfig then
+    _a_.CloudConfig = {}
     
-    -- Add CloudConfig methods if they don't exist
-    function NobUI.CloudConfig:Save(name)
+    function _a_.CloudConfig:Save(name)
         local config = {}
         if writefile then
             writefile("nobui_" .. name .. ".json", game:GetService("HttpService"):JSONEncode(config))
         end
     end
     
-    function NobUI.CloudConfig:Load(name)
+    function _a_.CloudConfig:Load(name)
         if readfile and isfile("nobui_" .. name .. ".json") then
             local config = game:GetService("HttpService"):JSONDecode(readfile("nobui_" .. name .. ".json"))
             return config
@@ -34,4 +33,5 @@ if not NobUI.CloudConfig then
 end
 
 -- Return the obfuscated core directly as NobUI
-return NobUI
+-- This way when users do: local ui = library:Init() it will work
+return _a_
